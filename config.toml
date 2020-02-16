@@ -1,0 +1,18 @@
+[servers]
+    [servers.local1]
+        address="127.0.0.1:6379"
+        password=""
+        db=0
+    [servers.local2]
+        address="127.0.0.1:6380"
+        password=""
+        db=1
+    [servers.remote1]
+        address="127.0.0.1:6381"
+        password=""
+        db=0
+[jobs]
+    [jobs.merge_locals_to_remote]
+        from="local1,local2"
+        to="remote1"
+        chunk_size=1000

@@ -3,14 +3,16 @@ package main
 import (
 	"flag"
 	"github.com/go-redis/redis"
+	"github.com/pelletier/go-toml"
 	"github.com/tufanbarisyildirim/redis-migrate/migrator"
+	"io/ioutil"
 	"log"
 )
 
 func main() {
 
 	var (
-		//configFile   = flag.String("config", "0", "config.toml")
+		configFile = flag.String("config", "0", "config.toml")
 		//	migrationJob = flag.String("job", "default", "the migration job name to work")
 		workerCount = flag.Int("worker", 5, "concurrent worker size")
 	)
@@ -21,6 +23,18 @@ func main() {
 	}
 
 	flag.Parse()
+
+	configBytes, err := ioutil.ReadFile(*configFile)
+	if err != nil {
+		panic(err)
+	}
+
+	config := &migrator.Config{}
+	err = toml.Unmarshal(configBytes, config)
+
+	if err != nil {
+		panic(err)
+	}
 
 	source := redis.NewClient(&redis.Options{
 		Addr:     "127.0.0.1:6379",
@@ -34,7 +48,7 @@ func main() {
 		DB:       0,
 	})
 
-	_, err := source.Ping().Result()
+	_, err = source.Ping().Result()
 	if err != nil {
 		log.Fatalf("error connecting source redis: %s", err)
 	}
